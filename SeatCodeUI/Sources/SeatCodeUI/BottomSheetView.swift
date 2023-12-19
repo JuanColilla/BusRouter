@@ -7,11 +7,11 @@
 
 import SwiftUI
 
+public enum SheetState {
+    case minimized, half, full
+}
+
 public struct BottomSheetView<Content: View>: View {
-    
-    public enum SheetState {
-        case minimized, half, full
-    }
     
     private var offset: CGFloat {
         switch sheetState {
@@ -73,22 +73,28 @@ public struct BottomSheetView<Content: View>: View {
                         state = value.translation.height
                     }
                     .onEnded { value in
-                        let snapDistances = [maxHeight * 0.9, maxHeight * 0.5, 0] // Minimizado, Medio, Completo
-                        let closestSnapDistance = snapDistances.min(by: { abs($0 - value.translation.height) < abs($1 - value.translation.height) }) ?? maxHeight
-
-                            switch closestSnapDistance {
-                            case snapDistances[0]: // Minimizado
+                        let dragThreshold = maxHeight * 0.1
+                        let dragDistance = abs(value.translation.height)
+                        
+                        // Si el arrastre está dentro del umbral, no cambia el estado
+                        if dragDistance < dragThreshold { return }
+                        
+                        if value.translation.height > 0 { // Arrastre hacia abajo
+                            switch sheetState {
+                            case .minimized, .half:
                                 sheetState = .minimized
-                            case snapDistances[1]: // Medio
-                                sheetState = .half
-                            default: // Completo
+                            case .full:
+                                // Si el arrastre hacia abajo es de una distancia superior a la mitad del máximo de altura permitido el nuevo estado será "minimized", si es de menos será "half"
+                                sheetState = dragDistance > abs(maxHeight * 0.5) ? .minimized : .half
+                            }
+                        } else { // Arrastre hacia arriba
+                            switch sheetState {
+                            case .minimized:
+                                // Si el arrastre hacia arriba es de una distancia superior a la mitad del máximo de altura permitido el nuevo estado será "full", si es de menos será "half"
+                                sheetState = dragDistance > abs(maxHeight * 0.5) ? .full : .half
+                            case .half, .full:
                                 sheetState = .full
                             }
-                        let dragThreshold = maxHeight * 0.25 // Ajusta según sea necesario
-                        if value.translation.height > dragThreshold {
-                            sheetState = value.translation.height > 0 ? .minimized : .half
-                        } else if value.translation.height < -dragThreshold {
-                            sheetState = value.translation.height < 0 ? .full : .half
                         }
                     }
             )
