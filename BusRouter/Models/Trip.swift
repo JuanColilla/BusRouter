@@ -8,7 +8,7 @@
 import Foundation
 import CoreLocation
 
-struct Trip: Codable, Equatable {
+struct Trip: Codable, Equatable, Hashable {
     var driverName: String
     var status: String
     var route: String
@@ -19,17 +19,17 @@ struct Trip: Codable, Equatable {
     var destination: Location
     var stops: [Stop]
 
-    struct Location: Codable, Equatable {
+    struct Location: Codable, Equatable, Hashable {
         var address: String
         var point: Coordinate
 
-        struct Coordinate: Codable, Equatable {
+        struct Coordinate: Codable, Equatable, Hashable {
             var _latitude: CLLocationDegrees
             var _longitude: CLLocationDegrees
         }
     }
 
-    struct Stop: Codable, Equatable {
+    struct Stop: Codable, Equatable, Hashable {
         var id: Int?
         var point: Location.Coordinate?
     }

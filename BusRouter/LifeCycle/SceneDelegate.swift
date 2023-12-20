@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import ComposableArchitecture
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -18,7 +19,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     options connectionOptions: UIScene.ConnectionOptions
   ) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
-    let mainView = MapView()
+    let mainView = MapView(
+        store: StoreOf<MapReducer>(
+            initialState: MapReducer.State()
+        ) {
+            MapReducer()
+        }
+    )
 
     let window = UIWindow(windowScene: windowScene)
     window.rootViewController = UIHostingController(rootView: mainView)
