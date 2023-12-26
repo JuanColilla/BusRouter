@@ -8,6 +8,6 @@
 import Foundation
 
 enum JSONError: LocalizedError {
-    case DECODING_ERROR(Error)
-    case ENCODING_ERROR(Error)
+  case DECODING_ERROR(Error)
+  case ENCODING_ERROR(Error)
 }
