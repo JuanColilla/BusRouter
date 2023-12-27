@@ -53,7 +53,7 @@ public struct BottomSheetView<Content: View>: View {
           RoundedRectangle(cornerRadius: 25.0)
             .fill(.gray.opacity(0.5))
             .frame(
-              width: 60, height: 6, alignment: /*@START_MENU_TOKEN@*/ .center /*@END_MENU_TOKEN@*/
+              width: 40, height: 5, alignment: /*@START_MENU_TOKEN@*/ .center /*@END_MENU_TOKEN@*/
             )
           Spacer()
         }

@@ -41,17 +41,19 @@ struct MapView: View {
                   .fontWeight(.bold)
                   .padding()
               }
-              .padding(.top)
+              .padding(.top, sheetState == .minimized ? 30 : 5)
               Divider()
               if case .success(let trips) = viewStore.tripList {
                 ScrollView {
                   ForEach(trips, id: \.self) { trip in
-                    RouteCell(
-                      description: trip.description
-                    )
+                    RouteCell(trip: trip)
                     Divider()
                   }
                 }
+                .frame(
+                  height: sheetState == .half
+                    ? geometry.size.height * 0.3 : geometry.size.height * 0.75
+                )
               } else if case .loading = viewStore.tripList {
                 Text("Cargando viajes...")
               } else {
