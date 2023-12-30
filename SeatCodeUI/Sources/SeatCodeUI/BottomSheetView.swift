@@ -26,22 +26,22 @@ public struct BottomSheetView<Content: View>: View {
   @GestureState
   private var translation: CGFloat = 0
 
-  @Environment(\.colorScheme)
-  private var colorScheme: ColorScheme
-
   @Binding
   var sheetState: SheetState
 
   let maxHeight: CGFloat
   var content: Content
+    var colorScheme: ColorScheme
 
   public init(
     sheetState: Binding<SheetState>,
     maxHeight: CGFloat,
+    colorScheme: ColorScheme,
     @ViewBuilder content: () -> Content
   ) {
     self._sheetState = sheetState
     self.maxHeight = maxHeight
+      self.colorScheme = colorScheme
     self.content = content()
   }
 
@@ -104,20 +104,8 @@ public struct BottomSheetView<Content: View>: View {
   }
 }
 
-struct BlurView: UIViewRepresentable {
-  var style: UIBlurEffect.Style
-
-  func makeUIView(context: Context) -> UIVisualEffectView {
-    return UIVisualEffectView(effect: UIBlurEffect(style: style))
-  }
-
-  func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
-    uiView.effect = UIBlurEffect(style: style)
-  }
-}
-
 #Preview {
-  BottomSheetView(sheetState: .constant(.half), maxHeight: 850) {
+    BottomSheetView(sheetState: .constant(.half), maxHeight: 850, colorScheme: .dark) {
     VStack(alignment: .center) {
       ForEach(0..<5, id: \.self) { index in
         Text("Item \(index)")
