@@ -10,6 +10,13 @@ import MapKit
 import SeatCodeUI
 import SwiftUI
 
+fileprivate extension CLLocationCoordinate2D {
+    static let seatCodeLocation: Self = CLLocationCoordinate2D(
+        latitude: 41.38401,
+        longitude: 2.17219
+    )
+}
+
 struct MapView: View {
     
     var colorScheme: ColorScheme {
@@ -22,10 +29,7 @@ struct MapView: View {
     @State
     private var camera: MapCameraPosition = .camera(
         MapCamera(
-            centerCoordinate: CLLocationCoordinate2D(
-                latitude: 41.38401,
-                longitude: 2.17219
-            ),
+            centerCoordinate: .seatCodeLocation,
             distance: 1000
         )
     )
@@ -58,6 +62,18 @@ struct MapView: View {
                             )
                         )
                     }
+                    .onChange(of: viewStore.selectedTrip) { _, selectedTrip in
+                        if selectedTrip == nil {
+                            withAnimation {
+                                camera = .camera(
+                                    MapCamera(
+                                        centerCoordinate: viewStore.location ?? .seatCodeLocation,
+                                        distance: 1000
+                                    )
+                                )
+                            }
+                        }
+                    }
                     
                     BottomSheetView(
                         sheetState: $sheetState,
@@ -76,7 +92,16 @@ struct MapView: View {
                             if case .success(let trips) = viewStore.tripList {
                                 ScrollView {
                                     ForEach(trips, id: \.self) { trip in
-                                        RouteCell(trip: trip)
+                                        TripCell(trip: trip)
+                                            .onTapGesture {
+                                                viewStore.send(.selectTrip(trip))
+                                                if trip.status == .ongoing || trip.status == .scheduled {
+                                                    withAnimation {
+                                                        sheetState = .minimized
+                                                        camera = .automatic
+                                                    }
+                                                }
+                                            }
                                         Divider()
                                     }
                                 }

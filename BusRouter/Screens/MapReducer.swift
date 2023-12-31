@@ -82,8 +82,10 @@ struct MapReducer: Reducer {
           }
           .cancellable(id: CancellableTaskID.updateLocation)
       case .selectTrip(let trip):
-          state.selectedTrip = trip
-          state.selectedTripRoute = trip.stops.map { CLLocationCoordinate2D(latitude: $0.point?._latitude ?? 0.0, longitude: $0.point?._latitude ?? 0.0) }
+          if trip.status == .ongoing || trip.status == .scheduled {
+              state.selectedTrip = trip
+              state.selectedTripRoute = trip.stops.map { CLLocationCoordinate2D(latitude: $0.point?._latitude ?? 0.0, longitude: $0.point?._latitude ?? 0.0) }
+          }
           return .none
       case ._newLocationReceived(let location):
           state.location = location.coordinate
