@@ -21,7 +21,7 @@ struct MapView: View {
     
     @State
     private var camera: MapCameraPosition = .camera(
-        .init(
+        MapCamera(
             centerCoordinate: CLLocationCoordinate2D(
                 latitude: 41.38401,
                 longitude: 2.17219
@@ -45,15 +45,18 @@ struct MapView: View {
                                 )
                                 .stroke(.blue, lineWidth: 5)
                             }
-                            
-                            
                         }
-                        
                     }
                     .mapStyle(.standard(elevation: .realistic))
                     .ignoresSafeArea(.all)
-                    .onAppear {
-                        
+                    .onChange(of: viewStore.location) { _, newLocation in
+                        guard let newLocation else { return }
+                        camera = .camera(
+                            MapCamera(
+                                centerCoordinate: newLocation,
+                                distance: 1000
+                            )
+                        )
                     }
                     
                     BottomSheetView(

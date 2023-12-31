@@ -45,7 +45,7 @@ struct MapReducer: Reducer {
     
   struct State: Equatable {
     var tripList: RemoteResult<[Trip], APIError> = .idle
-      var userLocation: CLLocation = CLLocation(latitude: 41.38401, longitude: 2.17219)
+      var location: CLLocationCoordinate2D? = nil
       var selectedTripRoute: [CLLocationCoordinate2D]? = nil
       var selectedTrip: Trip? = nil
   }
@@ -85,6 +85,9 @@ struct MapReducer: Reducer {
           state.selectedTrip = trip
           state.selectedTripRoute = trip.stops.map { CLLocationCoordinate2D(latitude: $0.point?._latitude ?? 0.0, longitude: $0.point?._latitude ?? 0.0) }
           return .none
+      case ._newLocationReceived(let location):
+          state.location = location.coordinate
+          return .cancel(id: CancellableTaskID.updateLocation)
       case ._fetchTrips:
         state.tripList = .loading
         return .run { send in
@@ -102,9 +105,6 @@ struct MapReducer: Reducer {
       case ._failedToFetchTrips(let error):
           state.tripList = .failure(error)
           return .none
-      case ._newLocationReceived(let location):
-          state.userLocation = location
-          return .cancel(id: CancellableTaskID.updateLocation)
       case ._locationNotAllowed:
           return .none
       case ._none:
