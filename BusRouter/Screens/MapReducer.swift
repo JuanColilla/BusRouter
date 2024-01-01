@@ -8,27 +8,16 @@
 import ComposableArchitecture
 import CoreLocation
 import MapKit
-
-enum CLError: LocalizedError, Equatable {
-    case permissionDenied
-    case other
-}
-
-extension MKCoordinateRegion: Equatable {
-    public static func == (lhs: MKCoordinateRegion, rhs: MKCoordinateRegion) -> Bool {
-            return lhs.center.latitude == rhs.center.latitude &&
-                   lhs.center.longitude == rhs.center.longitude &&
-                   lhs.span.latitudeDelta == rhs.span.latitudeDelta &&
-                   lhs.span.longitudeDelta == rhs.span.longitudeDelta
-        }
-}
+import Polyline
 
 struct MapReducer: Reducer {
     
+    // MARK: Task IDs for cancellation
     enum CancellableTaskID: Hashable {
         case updateLocation
     }
 
+    // MARK: Actions
     enum Action: Equatable {
         case onAppear
         case checkLocationPermission
@@ -43,13 +32,15 @@ struct MapReducer: Reducer {
         case _none
     }
     
+    // MARK: State
   struct State: Equatable {
     var tripList: RemoteResult<[Trip], APIError> = .idle
       var location: CLLocationCoordinate2D? = nil
-      var selectedTripRoute: [CLLocationCoordinate2D]? = nil
+      var selectedTripRoute: MKPolyline? = nil
       var selectedTrip: Trip? = nil
   }
 
+    // MARK: Reducer
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
@@ -84,7 +75,7 @@ struct MapReducer: Reducer {
       case .selectTrip(let trip):
           if trip.status == .ongoing || trip.status == .scheduled {
               state.selectedTrip = trip
-              state.selectedTripRoute = trip.stops.map { CLLocationCoordinate2D(latitude: $0.point?._latitude ?? 0.0, longitude: $0.point?._latitude ?? 0.0) }
+              state.selectedTripRoute = Polyline.init(encodedPolyline: trip.route).mkPolyline
           }
           return .none
       case ._newLocationReceived(let location):
@@ -116,45 +107,12 @@ struct MapReducer: Reducer {
   }
 }
 
-import Combine
-
-class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
-    private let locationManager = CLLocationManager()
-    
-    // MARK: Delegate Publisheres
-    @Published
-    var location: CLLocation?
-    
-    @Published
-    var authorizationStatus: CLAuthorizationStatus
-
-    override init() {
-        // LocationManagerDelegate Properties Initialization
-        self.authorizationStatus = .notDetermined
-        
-        // Parent Constructor Initialization
-        super.init()
-        
-        // Delegate Functions Execution
-        self.locationManager.delegate = self
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        self.locationManager.requestWhenInUseAuthorization()
-        self.authorizationStatus = locationManager.authorizationStatus
-        self.locationManager.startUpdatingLocation()
-    }
-
-    // MARK: Delegate Functions
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return } 
-        self.location = location
-    }
-    
-    // Handle the failure case
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Failed to find user's location: \(error.localizedDescription)")
-    }
-    
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        authorizationStatus = manager.authorizationStatus
-    }
+// MARK: MKCoordinateRegion Equatable Extension
+extension MKCoordinateRegion: Equatable {
+    public static func == (lhs: MKCoordinateRegion, rhs: MKCoordinateRegion) -> Bool {
+            return lhs.center.latitude == rhs.center.latitude &&
+                   lhs.center.longitude == rhs.center.longitude &&
+                   lhs.span.latitudeDelta == rhs.span.latitudeDelta &&
+                   lhs.span.longitudeDelta == rhs.span.longitudeDelta
+        }
 }

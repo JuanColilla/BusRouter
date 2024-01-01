@@ -44,15 +44,15 @@ struct MapView: View {
                         UserAnnotation()
                         if let tripRoute = viewStore.selectedTripRoute {
                             withAnimation(.default) {
-                                MapPolyline(
-                                    coordinates: tripRoute
-                                )
+                                MapPolyline(tripRoute)
                                 .stroke(.blue, lineWidth: 5)
                             }
                         }
                     }
                     .mapStyle(.standard(elevation: .realistic))
-                    .ignoresSafeArea(.all)
+                    .mapControls {
+                        MapUserLocationButton()
+                    }
                     .onChange(of: viewStore.location) { _, newLocation in
                         guard let newLocation else { return }
                         camera = .camera(
@@ -116,10 +116,9 @@ struct MapView: View {
                             }
                         }
                     }
-                    
+                    .ignoresSafeArea(.all)
                 }
             }
-            .ignoresSafeArea(.all)
             .onAppear {
                 viewStore.send(.onAppear)
             }
