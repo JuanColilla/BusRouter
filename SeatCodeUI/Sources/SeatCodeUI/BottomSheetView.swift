@@ -31,7 +31,7 @@ public struct BottomSheetView<Content: View>: View {
 
   let maxHeight: CGFloat
   var content: Content
-    var colorScheme: ColorScheme
+  var colorScheme: ColorScheme
 
   public init(
     sheetState: Binding<SheetState>,
@@ -41,7 +41,7 @@ public struct BottomSheetView<Content: View>: View {
   ) {
     self._sheetState = sheetState
     self.maxHeight = maxHeight
-      self.colorScheme = colorScheme
+    self.colorScheme = colorScheme
     self.content = content()
   }
 
@@ -105,7 +105,7 @@ public struct BottomSheetView<Content: View>: View {
 }
 
 #Preview {
-    BottomSheetView(sheetState: .constant(.half), maxHeight: 850, colorScheme: .dark) {
+  BottomSheetView(sheetState: .constant(.half), maxHeight: 850, colorScheme: .dark) {
     VStack(alignment: .center) {
       ForEach(0..<5, id: \.self) { index in
         Text("Item \(index)")

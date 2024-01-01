@@ -5,62 +5,62 @@
 //  Created by Juan Colilla on 24/12/23.
 //
 
-import SwiftUI
 import SeatCodeUI
+import SwiftUI
 
 struct TripCell: View {
   var trip: Trip
-    var colorScheme: ColorScheme {
-        return Current.colorScheme
+  var colorScheme: ColorScheme {
+    return Current.colorScheme
+  }
+  var statusText: String {
+    switch trip.status {
+    case .scheduled, .ongoing:
+      ""
+    case .cancelled:
+      "Cancelado"
+    case .finalized:
+      "Finalizado"
+    case .other:
+      "No disponible"
     }
-    var statusText: String {
-        switch trip.status {
-        case .scheduled, .ongoing:
-            ""
-        case .cancelled:
-            "Cancelado"
-        case .finalized:
-            "Finalizado"
-        case .other:
-            "No disponible"
-        }
-    }
-    
+  }
+
   var body: some View {
-      ZStack {
-          VStack {
-            HStack {
-              Image(systemName: "person.fill")
-              Text(trip.driverName)
-              Spacer()
-              Text(trip.startTime.shortHour())
-            }
-            HStack {
-              Spacer()
-              Image(systemName: "arrow.down")
-                .padding(.trailing)
-            }
-            .padding(.vertical, 1)
-            HStack {
-              Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
-              Text(trip.description)
-              Spacer()
-              Text(trip.endTime.shortHour())
-            }
-          }
-          switch trip.status {
-          case .scheduled, .ongoing:
-              EmptyView()
-          case .cancelled, .finalized, .other:
-              Text(statusText)
-                  .padding(5)
-                  .background {
-                      BlurView(style: .light)
-                          .clipShape(RoundedRectangle(cornerRadius: 5.0))
-                  }
+    ZStack {
+      VStack {
+        HStack {
+          Image(systemName: "person.fill")
+          Text(trip.driverName)
+          Spacer()
+          Text(trip.startTime.shortHour())
+        }
+        HStack {
+          Spacer()
+          Image(systemName: "arrow.down")
+            .padding(.trailing)
+        }
+        .padding(.vertical, 1)
+        HStack {
+          Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
+          Text(trip.description)
+          Spacer()
+          Text(trip.endTime.shortHour())
+        }
+      }
+      switch trip.status {
+      case .scheduled, .ongoing:
+        EmptyView()
+      case .cancelled, .finalized, .other:
+        Text(statusText)
+          .padding(5)
+          .background {
+            BlurView(style: .light)
+              .clipShape(RoundedRectangle(cornerRadius: 5.0))
           }
       }
-      .padding()
+    }
+    .padding()
   }
 }
 
