@@ -36,9 +36,11 @@ public struct MapView: View {
           MapPolyline(tripRoute)
             .stroke(.blue, lineWidth: 5)
         }
-        // MARK: Selected Route Stops
-        if let stops = stops {
-          ForEach(Array(zip(stops.indices, stops)), id: \.0) { index, stop in
+      }
+      // MARK: Selected Route Stops
+      if let stops = stops {
+        ForEach(Array(zip(stops.indices, stops)), id: \.0) { index, stop in
+          withAnimation {
             Marker(
               "Parada \(index+1)",
               coordinate: stop
