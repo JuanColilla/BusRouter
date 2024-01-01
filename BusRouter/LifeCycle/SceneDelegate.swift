@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     options connectionOptions: UIScene.ConnectionOptions
   ) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
-    let mainView = MapView(
+    let mainView = MainView(
       store: StoreOf<MapReducer>(
         initialState: MapReducer.State()
       ) {

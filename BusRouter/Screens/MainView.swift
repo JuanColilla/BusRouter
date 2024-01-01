@@ -10,19 +10,9 @@ import MapKit
 import SeatCodeUI
 import SwiftUI
 
-fileprivate extension CLLocationCoordinate2D {
-    static let seatCodeLocation: Self = CLLocationCoordinate2D(
-        latitude: 41.38401,
-        longitude: 2.17219
-    )
-}
-
-struct MapView: View {
+struct MainView: View {
     
-    var colorScheme: ColorScheme {
-        return Current.colorScheme
-    }
-    
+    // MARK: View State Properties
     @State
     private var sheetState: SheetState = .minimized
     
@@ -34,25 +24,24 @@ struct MapView: View {
         )
     )
     
+    // MARK: ViewStore
     let store: StoreOf<MapReducer>
     
+    var colorScheme: ColorScheme {
+        return Current.colorScheme
+    }
+    
+    // MARK: View Body
     var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             GeometryReader { geometry in
                 ZStack {
-                    Map(position: $camera ) {
-                        UserAnnotation()
-                        if let tripRoute = viewStore.selectedTripRoute {
-                            withAnimation(.default) {
-                                MapPolyline(tripRoute)
-                                .stroke(.blue, lineWidth: 5)
-                            }
-                        }
-                    }
-                    .mapStyle(.standard(elevation: .realistic))
-                    .mapControls {
-                        MapUserLocationButton()
-                    }
+                    MapView(
+                        camera: $camera,
+                        tripRoute: viewStore.selectedTripRoute,
+                        stops: viewStore.selectedTripRouteStops
+                    )
+                    // MARK: Map Observers
                     .onChange(of: viewStore.location) { _, newLocation in
                         guard let newLocation else { return }
                         camera = .camera(
@@ -74,7 +63,6 @@ struct MapView: View {
                             }
                         }
                     }
-                    
                     BottomSheetView(
                         sheetState: $sheetState,
                         maxHeight: geometry.size.height * 0.9,
@@ -126,8 +114,16 @@ struct MapView: View {
     }
 }
 
+// MARK: Default Location
+fileprivate extension CLLocationCoordinate2D {
+    static let seatCodeLocation: Self = CLLocationCoordinate2D(
+        latitude: 41.38401,
+        longitude: 2.17219
+    )
+}
+
 #Preview {
-    MapView(
+    MainView(
         store: StoreOf<MapReducer>(
             initialState: MapReducer.State()
         ) {

@@ -38,6 +38,10 @@ struct MapReducer: Reducer {
       var location: CLLocationCoordinate2D? = nil
       var selectedTripRoute: MKPolyline? = nil
       var selectedTrip: Trip? = nil
+      var selectedTripRouteStops: [CLLocationCoordinate2D]? {
+          guard let selectedTrip else { return nil }
+          return Polyline(encodedPolyline: selectedTrip.route).coordinates
+      }
   }
 
     // MARK: Reducer
