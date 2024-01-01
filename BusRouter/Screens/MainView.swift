@@ -38,8 +38,14 @@ struct MainView: View {
         ZStack {
           MapView(
             camera: $camera,
-            tripRoute: viewStore.selectedTripRoute,
-            stops: viewStore.selectedTripRouteStops
+            route: viewStore.selectedTrip != nil ?
+            MapView.Route(
+                origin: viewStore.selectedTrip!.origin.point.cllocationCoordinate2D,
+                stops: viewStore.selectedTripRouteStops!,
+                destination: viewStore.selectedTrip!.destination.point.cllocationCoordinate2D,
+                polyline: viewStore.selectedTripRoute!
+            ) : nil
+            
           )
           // MARK: Map Observers
           .onChange(of: viewStore.location) { _, newLocation in
@@ -112,6 +118,7 @@ struct MainView: View {
       }
     }
   }
+    
 }
 
 // MARK: Default Location

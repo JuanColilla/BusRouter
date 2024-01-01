@@ -10,46 +10,75 @@ import MapKit
 import SwiftUI
 
 public struct MapView: View {
+    
+    public struct Route {
+        var origin: CLLocationCoordinate2D
+        var stops: [CLLocationCoordinate2D]
+        var destination: CLLocationCoordinate2D
+        var polyline: MKPolyline
+        
+        public init(
+            origin: CLLocationCoordinate2D,
+            stops: [CLLocationCoordinate2D],
+            destination: CLLocationCoordinate2D,
+            polyline: MKPolyline
+        ) {
+            self.origin = origin
+            self.stops = stops.dropFirst().dropLast()
+            self.destination = destination
+            self.polyline = polyline
+        }
+    }
 
   @Binding
   var camera: MapCameraPosition
 
-  var tripRoute: MKPolyline?
-  var stops: [CLLocationCoordinate2D]?
+    var route: Route?
 
   public init(
     camera: Binding<MapCameraPosition>,
-    tripRoute: MKPolyline? = nil,
-    stops: [CLLocationCoordinate2D]? = nil
+    route: Route?
   ) {
     self._camera = camera
-    self.tripRoute = tripRoute
-    self.stops = stops
+    self.route = route
   }
 
   public var body: some View {
     Map(position: $camera) {
       UserAnnotation()
-      // MARK: Selected Route Line
-      if let tripRoute = tripRoute {
-        withAnimation(.default) {
-          MapPolyline(tripRoute)
-            .stroke(.blue, lineWidth: 5)
+        // MARK: Selected Route Line
+        if let route {
+            MapPolyline(route.polyline)
+                .stroke(.blue, lineWidth: 5)
+            
+            Annotation(
+            "Origen",
+            coordinate: route.origin
+            ) {
+                OriginMarker()
+            }
+            
+            Annotation(
+            "Destino",
+            coordinate: route.destination
+            ) {
+                DestinationMarker()
+            }
+            
+            // MARK: Selected Route Stops
+            ForEach(Array(zip(route.stops.indices, route.stops)), id: \.0) { index, stop in
+                Annotation(
+                "Parada \(index+1)",
+                coordinate: stop
+                ) {
+                    StopMarker()
+                }
+            }
+            
+            
         }
-      }
-      // MARK: Selected Route Stops
-      if let stops = stops {
-        ForEach(Array(zip(stops.indices, stops)), id: \.0) { index, stop in
-          withAnimation {
-            Marker(
-              "Parada \(index+1)",
-              coordinate: stop
-            )
-          }
-        }
-      }
     }
-    // MARK: Map Controls
+      // MARK: Map Controls
     .mapControls {
       MapUserLocationButton()
     }

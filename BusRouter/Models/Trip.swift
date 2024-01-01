@@ -61,3 +61,9 @@ extension Trip {
     }
   }
 }
+
+extension Trip.Location.Coordinate {
+    var cllocationCoordinate2D: CLLocationCoordinate2D {
+        return CLLocationCoordinate2D(latitude: self._latitude, longitude: self._longitude)
+    }
+}
