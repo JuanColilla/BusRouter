@@ -43,7 +43,8 @@ struct MainView: View {
                 origin: viewStore.selectedTrip!.origin.point.cllocationCoordinate2D,
                 stops: viewStore.selectedTripRouteStops!,
                 destination: viewStore.selectedTrip!.destination.point.cllocationCoordinate2D,
-                polyline: viewStore.selectedTripRoute!
+                polyline: viewStore.selectedTripRoute!,
+                stopInfo: viewStore.stopInfo
             ) : nil
             
           )

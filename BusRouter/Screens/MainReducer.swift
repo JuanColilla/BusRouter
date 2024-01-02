@@ -9,6 +9,7 @@ import ComposableArchitecture
 import CoreLocation
 import MapKit
 import Polyline
+import SeatCodeUI
 
 struct MainReducer: Reducer {
 
@@ -18,31 +19,45 @@ struct MainReducer: Reducer {
   }
 
   // MARK: Actions
-  enum Action: Equatable {
-    case onAppear
-    case checkLocationPermission
-    case updateLocation
-    case selectTrip(Trip)
-
-    case _newLocationReceived(CLLocation)
-    case _locationNotAllowed
-    case _fetchTrips
-    case _tripsReceived([Trip])
-    case _failedToFetchTrips(APIError)
-    case _none
-  }
-
-  // MARK: State
-  struct State: Equatable {
-    var tripList: RemoteResult<[Trip], APIError> = .idle
-    var location: CLLocationCoordinate2D? = nil
-    var selectedTripRoute: MKPolyline? = nil
-    var selectedTrip: Trip? = nil
-    var selectedTripRouteStops: [CLLocationCoordinate2D]? {
-      guard let selectedTrip else { return nil }
-      return Polyline(encodedPolyline: selectedTrip.route).coordinates
+    enum Action: Equatable {
+        case onAppear
+        case checkLocationPermission
+        case updateLocation
+        case selectTrip(Trip)
+        
+        case _newLocationReceived(CLLocation)
+        case _locationNotAllowed
+        case _fetchTrips
+        case _tripsReceived([Trip])
+        case _failedToFetchTrips(APIError)
+        case _fetchStops
+        case _stopsReceived(Stop)
+        case _failedToFetchStops(APIError)
+        case _none
     }
-  }
+
+    // MARK: State
+    struct State: Equatable {
+        var tripList: RemoteResult<[Trip], APIError> = .idle
+        
+        var selectedTrip: Trip? = nil
+        var location: CLLocationCoordinate2D? = nil
+        var selectedTripRoute: MKPolyline? = nil
+        var selectedTripStopInfo: RemoteResult<StopMarker.StopInfo, APIError> = .idle
+        
+        var stopInfo: StopMarker.StopInfo? {
+            if case .success(let stopInfo) = selectedTripStopInfo {
+                return stopInfo
+            } else {
+                return nil
+            }
+        }
+        
+        var selectedTripRouteStops: [CLLocationCoordinate2D]? {
+            guard let selectedTrip else { return nil }
+            return Polyline(encodedPolyline: selectedTrip.route).coordinates
+        }
+    }
 
   // MARK: Reducer
   var body: some ReducerOf<Self> {
@@ -85,15 +100,15 @@ struct MainReducer: Reducer {
           state.selectedTrip = trip
           state.selectedTripRoute = Polyline.init(encodedPolyline: trip.route).mkPolyline
         }
-        return .none
+          return .send(._fetchStops)
       case ._newLocationReceived(let location):
         state.location = location.coordinate
         return .cancel(id: CancellableTaskID.updateLocation)
       case ._fetchTrips:
         state.tripList = .loading
         return .run { send in
-          let apiResult: Result<[Trip], APIError> = await FetchTripsUseCase().execute()
-          switch apiResult {
+          let tripResult: Result<[Trip], APIError> = await FetchTripsUseCase().execute()
+          switch tripResult {
           case .success(let tripList):
             await send(._tripsReceived(tripList))
           case .failure(let error):
@@ -106,10 +121,35 @@ struct MainReducer: Reducer {
       case ._failedToFetchTrips(let error):
         state.tripList = .failure(error)
         return .none
+      case ._fetchStops:
+          state.selectedTripStopInfo = .loading
+          return .run { send in
+              let stopInfoResult = await FetchStopInfoUseCase().execute()
+              switch stopInfoResult {
+              case .success(let stopInfo):
+                  await send(._stopsReceived(stopInfo))
+              case .failure(let error):
+                  await send(._failedToFetchStops(error))
+              }
+          }
+      case ._stopsReceived(let stop):
+          state.selectedTripStopInfo = .success(
+            StopMarker.StopInfo(
+                passengerName: stop.userName,
+                address: stop.address,
+                stopTime: stop.stopTime.shortHour(),
+                paid: stop.paid,
+                price: stop.price
+            )
+          )
+          return .none
+      case ._failedToFetchStops(let error):
+          return .none
       case ._locationNotAllowed:
         return .none
       case ._none:
         return .none
+      
       }
     }
   }

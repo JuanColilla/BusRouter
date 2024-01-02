@@ -16,23 +16,25 @@ public struct MapView: View {
         var stops: [CLLocationCoordinate2D]
         var destination: CLLocationCoordinate2D
         var polyline: MKPolyline
+        var stopInfo: StopMarker.StopInfo?
         
         public init(
             origin: CLLocationCoordinate2D,
             stops: [CLLocationCoordinate2D],
             destination: CLLocationCoordinate2D,
-            polyline: MKPolyline
+            polyline: MKPolyline,
+            stopInfo: StopMarker.StopInfo?
         ) {
             self.origin = origin
             self.stops = stops.dropFirst().dropLast()
             self.destination = destination
             self.polyline = polyline
+            self.stopInfo = stopInfo
         }
     }
 
   @Binding
   var camera: MapCameraPosition
-
     var route: Route?
 
   public init(
@@ -71,7 +73,7 @@ public struct MapView: View {
                 "Parada \(index+1)",
                 coordinate: stop
                 ) {
-                    StopMarker()
+                    StopMarker(stopInfo: route.stopInfo)
                 }
             }
             
