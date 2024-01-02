@@ -75,20 +75,20 @@ struct TripCell: View {
       description: "Viaje a la ciudad",
       origin: Trip.Location(
         address: "Calle Falsa 123",
-        point: Trip.Location.Coordinate(_latitude: -33.456, _longitude: -70.657)
+        point: Coordinate(latitude: -33.456, longitude: -70.657)
       ),
       destination: Trip.Location(
         address: "Avenida Siempre Viva 742",
-        point: Trip.Location.Coordinate(_latitude: -33.123, _longitude: -70.123)
+        point: Coordinate(latitude: -33.123, longitude: -70.123)
       ),
       stops: [
         Trip.Stop(
           id: 1,
-          point: Trip.Location.Coordinate(_latitude: -33.333, _longitude: -70.333)
+          point: Coordinate(latitude: -33.333, longitude: -70.333)
         ),
         Trip.Stop(
           id: 2,
-          point: Trip.Location.Coordinate(_latitude: -33.444, _longitude: -70.444)
+          point: Coordinate(latitude: -33.444, longitude: -70.444)
         ),
       ]
     )

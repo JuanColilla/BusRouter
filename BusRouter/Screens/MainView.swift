@@ -25,7 +25,7 @@ struct MainView: View {
   )
 
   // MARK: ViewStore
-  let store: StoreOf<MapReducer>
+  let store: StoreOf<MainReducer>
 
   var colorScheme: ColorScheme {
     return Current.colorScheme
@@ -103,6 +103,9 @@ struct MainView: View {
                   height: sheetState == .half
                     ? geometry.size.height * 0.3 : geometry.size.height * 0.75
                 )
+                .refreshable {
+                    viewStore.send(._fetchTrips)
+                }
               } else if case .loading = viewStore.tripList {
                 Text("Cargando viajes...")
               } else {
@@ -131,10 +134,10 @@ extension CLLocationCoordinate2D {
 
 #Preview {
   MainView(
-    store: StoreOf<MapReducer>(
-      initialState: MapReducer.State()
+    store: StoreOf<MainReducer>(
+      initialState: MainReducer.State()
     ) {
-      MapReducer()
+      MainReducer()
     }
   )
 }

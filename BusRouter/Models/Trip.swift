@@ -5,7 +5,6 @@
 //  Created by Juan Colilla on 20/12/23.
 //
 
-import CoreLocation
 import Foundation
 
 struct Trip: Codable, Equatable, Hashable {
@@ -19,19 +18,14 @@ struct Trip: Codable, Equatable, Hashable {
   var destination: Location
   var stops: [Stop]
 
-  struct Location: Codable, Equatable, Hashable {
-    var address: String
-    var point: Coordinate
-
-    struct Coordinate: Codable, Equatable, Hashable {
-      var _latitude: CLLocationDegrees
-      var _longitude: CLLocationDegrees
+    struct Location: Codable, Equatable, Hashable {
+      var address: String
+      var point: Coordinate
     }
-  }
 
   struct Stop: Codable, Equatable, Hashable {
     var id: Int?
-    var point: Location.Coordinate?
+    var point: Coordinate?
   }
 }
 
@@ -60,10 +54,4 @@ extension Trip {
       }
     }
   }
-}
-
-extension Trip.Location.Coordinate {
-    var cllocationCoordinate2D: CLLocationCoordinate2D {
-        return CLLocationCoordinate2D(latitude: self._latitude, longitude: self._longitude)
-    }
 }

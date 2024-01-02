@@ -10,7 +10,7 @@ import CoreLocation
 import MapKit
 import Polyline
 
-struct MapReducer: Reducer {
+struct MainReducer: Reducer {
 
   // MARK: Task IDs for cancellation
   enum CancellableTaskID: Hashable {
@@ -60,9 +60,9 @@ struct MapReducer: Reducer {
             .map { authorizationStatus in
               switch authorizationStatus {
               case .authorizedAlways, .authorizedWhenInUse:
-                return MapReducer.Action.updateLocation
+                return MainReducer.Action.updateLocation
               default:
-                return MapReducer.Action._locationNotAllowed
+                return MainReducer.Action._locationNotAllowed
               }
             }
         }
@@ -72,11 +72,15 @@ struct MapReducer: Reducer {
             .receive(on: DispatchQueue.main)
             .map { location in
               guard let location else { return ._none }
-              return MapReducer.Action._newLocationReceived(location)
+              return MainReducer.Action._newLocationReceived(location)
             }
         }
         .cancellable(id: CancellableTaskID.updateLocation)
       case .selectTrip(let trip):
+          if state.selectedTrip == trip {
+              state.selectedTrip = nil
+              return .none
+          }
         if trip.status == .ongoing || trip.status == .scheduled {
           state.selectedTrip = trip
           state.selectedTripRoute = Polyline.init(encodedPolyline: trip.route).mkPolyline
