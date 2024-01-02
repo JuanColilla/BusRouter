@@ -20,10 +20,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   ) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
     let mainView = MainView(
-      store: StoreOf<MapReducer>(
-        initialState: MapReducer.State()
+      store: StoreOf<MainReducer>(
+        initialState: MainReducer.State()
       ) {
-        MapReducer()
+        MainReducer()
       }
     )
 
