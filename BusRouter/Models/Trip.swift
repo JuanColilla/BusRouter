@@ -18,10 +18,10 @@ struct Trip: Codable, Equatable, Hashable {
   var destination: Location
   var stops: [Stop]
 
-    struct Location: Codable, Equatable, Hashable {
-      var address: String
-      var point: Coordinate
-    }
+  struct Location: Codable, Equatable, Hashable {
+    var address: String
+    var point: Coordinate
+  }
 
   struct Stop: Codable, Equatable, Hashable {
     var id: Int?
