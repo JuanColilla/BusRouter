@@ -10,7 +10,7 @@ import Foundation
 
 struct Trip: Codable, Equatable, Hashable {
   var driverName: String
-  var status: String
+  var status: Trip.Status
   var route: String
   var startTime: String
   var endTime: String
@@ -33,4 +33,37 @@ struct Trip: Codable, Equatable, Hashable {
     var id: Int?
     var point: Location.Coordinate?
   }
+}
+
+extension Trip {
+  enum Status: RawRepresentable, Codable, Equatable, Hashable {
+    typealias RawValue = String
+    case scheduled, ongoing, cancelled, finalized, other
+
+    var rawValue: String {
+      switch self {
+      case .scheduled: return "scheduled"
+      case .ongoing: return "ongoing"
+      case .cancelled: return "cancelled"
+      case .finalized: return "finalized"
+      case .other: return "other"
+      }
+    }
+
+    init(rawValue: String) {
+      switch rawValue {
+      case "scheduled": self = .scheduled
+      case "ongoing": self = .ongoing
+      case "cancelled": self = .cancelled
+      case "finalized": self = .finalized
+      default: self = .other
+      }
+    }
+  }
+}
+
+extension Trip.Location.Coordinate {
+    var cllocationCoordinate2D: CLLocationCoordinate2D {
+        return CLLocationCoordinate2D(latitude: self._latitude, longitude: self._longitude)
+    }
 }
