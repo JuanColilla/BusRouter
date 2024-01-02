@@ -19,10 +19,6 @@ struct OriginMarker: View {
             Circle()
                 .foregroundStyle(.green)
         }
-//        .overlay(
-//            Circle()
-//                .stroke(Color.black, lineWidth: 2)        
-//        )
     }
 }
 
