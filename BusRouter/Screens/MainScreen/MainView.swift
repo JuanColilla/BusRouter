@@ -38,15 +38,15 @@ struct MainView: View {
         ZStack {
           MapView(
             camera: $camera,
-            route: viewStore.selectedTrip != nil ?
-            MapView.Route(
+            route: viewStore.selectedTrip != nil
+              ? MapView.Route(
                 origin: viewStore.selectedTrip!.origin.point.cllocationCoordinate2D,
                 stops: viewStore.selectedTripRouteStops!,
                 destination: viewStore.selectedTrip!.destination.point.cllocationCoordinate2D,
                 polyline: viewStore.selectedTripRoute!,
                 stopInfo: viewStore.stopInfo
-            ) : nil
-            
+              ) : nil
+
           )
           // MARK: Map Observers
           .onChange(of: viewStore.location) { _, newLocation in
@@ -105,7 +105,7 @@ struct MainView: View {
                     ? geometry.size.height * 0.3 : geometry.size.height * 0.75
                 )
                 .refreshable {
-                    viewStore.send(._fetchTrips)
+                  viewStore.send(._fetchTrips)
                 }
               } else if case .loading = viewStore.tripList {
                 Text("Cargando viajes...")
@@ -122,7 +122,7 @@ struct MainView: View {
       }
     }
   }
-    
+
 }
 
 // MARK: Default Location

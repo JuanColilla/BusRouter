@@ -19,45 +19,45 @@ struct MainReducer: Reducer {
   }
 
   // MARK: Actions
-    enum Action: Equatable {
-        case onAppear
-        case checkLocationPermission
-        case updateLocation
-        case selectTrip(Trip)
-        
-        case _newLocationReceived(CLLocation)
-        case _locationNotAllowed
-        case _fetchTrips
-        case _tripsReceived([Trip])
-        case _failedToFetchTrips(APIError)
-        case _fetchStops
-        case _stopsReceived(Stop)
-        case _failedToFetchStops(APIError)
-        case _none
+  enum Action: Equatable {
+    case onAppear
+    case checkLocationPermission
+    case updateLocation
+    case selectTrip(Trip)
+
+    case _newLocationReceived(CLLocation)
+    case _locationNotAllowed
+    case _fetchTrips
+    case _tripsReceived([Trip])
+    case _failedToFetchTrips(APIError)
+    case _fetchStops
+    case _stopsReceived(Stop)
+    case _failedToFetchStops(APIError)
+    case _none
+  }
+
+  // MARK: State
+  struct State: Equatable {
+    var tripList: RemoteResult<[Trip], APIError> = .idle
+
+    var selectedTrip: Trip? = nil
+    var location: CLLocationCoordinate2D? = nil
+    var selectedTripRoute: MKPolyline? = nil
+    var selectedTripStopInfo: RemoteResult<StopMarker.StopInfo, APIError> = .idle
+
+    var stopInfo: StopMarker.StopInfo? {
+      if case .success(let stopInfo) = selectedTripStopInfo {
+        return stopInfo
+      } else {
+        return nil
+      }
     }
 
-    // MARK: State
-    struct State: Equatable {
-        var tripList: RemoteResult<[Trip], APIError> = .idle
-        
-        var selectedTrip: Trip? = nil
-        var location: CLLocationCoordinate2D? = nil
-        var selectedTripRoute: MKPolyline? = nil
-        var selectedTripStopInfo: RemoteResult<StopMarker.StopInfo, APIError> = .idle
-        
-        var stopInfo: StopMarker.StopInfo? {
-            if case .success(let stopInfo) = selectedTripStopInfo {
-                return stopInfo
-            } else {
-                return nil
-            }
-        }
-        
-        var selectedTripRouteStops: [CLLocationCoordinate2D]? {
-            guard let selectedTrip else { return nil }
-            return Polyline(encodedPolyline: selectedTrip.route).coordinates
-        }
+    var selectedTripRouteStops: [CLLocationCoordinate2D]? {
+      guard let selectedTrip else { return nil }
+      return Polyline(encodedPolyline: selectedTrip.route).coordinates
     }
+  }
 
   // MARK: Reducer
   var body: some ReducerOf<Self> {
@@ -92,15 +92,15 @@ struct MainReducer: Reducer {
         }
         .cancellable(id: CancellableTaskID.updateLocation)
       case .selectTrip(let trip):
-          if state.selectedTrip == trip {
-              state.selectedTrip = nil
-              return .none
-          }
+        if state.selectedTrip == trip {
+          state.selectedTrip = nil
+          return .none
+        }
         if trip.status == .ongoing || trip.status == .scheduled {
           state.selectedTrip = trip
           state.selectedTripRoute = Polyline.init(encodedPolyline: trip.route).mkPolyline
         }
-          return .send(._fetchStops)
+        return .send(._fetchStops)
       case ._newLocationReceived(let location):
         state.location = location.coordinate
         return .cancel(id: CancellableTaskID.updateLocation)
@@ -122,34 +122,34 @@ struct MainReducer: Reducer {
         state.tripList = .failure(error)
         return .none
       case ._fetchStops:
-          state.selectedTripStopInfo = .loading
-          return .run { send in
-              let stopInfoResult = await FetchStopInfoUseCase().execute()
-              switch stopInfoResult {
-              case .success(let stopInfo):
-                  await send(._stopsReceived(stopInfo))
-              case .failure(let error):
-                  await send(._failedToFetchStops(error))
-              }
+        state.selectedTripStopInfo = .loading
+        return .run { send in
+          let stopInfoResult = await FetchStopInfoUseCase().execute()
+          switch stopInfoResult {
+          case .success(let stopInfo):
+            await send(._stopsReceived(stopInfo))
+          case .failure(let error):
+            await send(._failedToFetchStops(error))
           }
+        }
       case ._stopsReceived(let stop):
-          state.selectedTripStopInfo = .success(
-            StopMarker.StopInfo(
-                passengerName: stop.userName,
-                address: stop.address,
-                stopTime: stop.stopTime.shortHour(),
-                paid: stop.paid,
-                price: stop.price
-            )
+        state.selectedTripStopInfo = .success(
+          StopMarker.StopInfo(
+            passengerName: stop.userName,
+            address: stop.address,
+            stopTime: stop.stopTime.shortHour(),
+            paid: stop.paid,
+            price: stop.price
           )
-          return .none
+        )
+        return .none
       case ._failedToFetchStops(let error):
-          return .none
+        return .none
       case ._locationNotAllowed:
         return .none
       case ._none:
         return .none
-      
+
       }
     }
   }
