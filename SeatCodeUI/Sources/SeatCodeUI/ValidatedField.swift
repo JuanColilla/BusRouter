@@ -12,9 +12,8 @@ public struct ValidatedField: View {
     
     @Binding
     public var value: String
-    @Binding
-    public var validationState: ValidationState
     
+    public var validationState: ValidationState
     public var title: String
     public var hint: String
     
@@ -22,12 +21,12 @@ public struct ValidatedField: View {
         value: Binding<String>,
         title: String,
         hint: String,
-        validationState: Binding<ValidationState>
+        validationState: ValidationState
     ) {
         self._value = value
         self.title = title
         self.hint = hint
-        self._validationState = validationState
+        self.validationState = validationState
     }
     
     private var validationImage: String {
@@ -82,6 +81,6 @@ public struct ValidatedField: View {
         value: .constant("Juan"),
         title: "Nombre",
         hint: "John",
-        validationState: .constant(.idle)
+        validationState: .idle
     )
 }
