@@ -8,10 +8,14 @@
 import SwiftUI
 
 struct TextView: UIViewRepresentable {
+    
+    
     @Binding
     var text: String
+    
     @State
     private var isEditing = false
+    
     var placeholder: String
     var characterLimit: Int
 
@@ -28,7 +32,7 @@ struct TextView: UIViewRepresentable {
             uiView.textColor = .lightGray
         } else {
             uiView.text = text
-            uiView.textColor = .black
+            uiView.textColor = Current.colorScheme == .light ? .black : .white
         }
     }
     
@@ -53,7 +57,7 @@ struct TextView: UIViewRepresentable {
         func textViewDidBeginEditing(_ textView: UITextView) {
             if textView.textColor == .lightGray {
                 textView.text = nil
-                textView.textColor = .black
+                textView.textColor = Current.colorScheme == .light ? .black : .white
             }
             parent.isEditing = true
         }
