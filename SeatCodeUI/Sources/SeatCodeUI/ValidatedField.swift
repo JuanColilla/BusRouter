@@ -10,6 +10,9 @@ import ValidationKit
 
 public struct ValidatedField: View {
     
+    @Environment(\.colorScheme)
+    var appearance
+    
     @Binding
     public var value: String
     
@@ -43,7 +46,7 @@ public struct ValidatedField: View {
     private var validationColor: Color {
         switch validationState {
         case .idle:
-            return .black
+            return appearance == .light ? .black : .white
         case .valid:
             return .green
         case .locked:
