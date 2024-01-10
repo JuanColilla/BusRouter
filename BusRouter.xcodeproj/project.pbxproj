@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -386,7 +386,7 @@
 				};
 			};
 			buildConfigurationList = D9D5BEE72B4E387C000ABAEE /* Build configuration list for PBXProject "BusRouter" */;
-			compatibilityVersion = "Xcode 14.0";
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -626,6 +626,7 @@
 				INFOPLIST_FILE = BusRouter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Bus Router";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Se requiere del permiso para mostrar su ubicación en el mapa.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -660,6 +661,7 @@
 				INFOPLIST_FILE = BusRouter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Bus Router";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Se requiere del permiso para mostrar su ubicación en el mapa.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen.storyboard;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
