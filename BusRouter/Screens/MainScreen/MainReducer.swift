@@ -143,7 +143,7 @@ struct MainReducer: Reducer {
           )
         )
         return .none
-      case ._failedToFetchStops(let error):
+      case ._failedToFetchStops(_):
         return .none
       case ._locationNotAllowed:
         return .none
